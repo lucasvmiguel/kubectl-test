@@ -2,16 +2,20 @@ on: [pull_request, push]
 
 jobs:
   example:
-    name: Example Minikube-Kubernetes Cluster interaction
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Install JQ
+        run: apt-get install jq
+      - name: Install Kubectl Test
+        run: chmod +x ./kubectl-test && cp ./kubectl-test /usr/local/bin
       - name: Setup Minikube
         uses: manusa/actions-setup-minikube@v1.0.1
         with:
           minikube version: "v1.5.2"
           kubernetes version: "v1.16.2"
           github token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Interact with the cluster
-        run: kubectl get nodes
+      - name: Verify Kubectl Test Plugin
+        run: kubectl test --help
