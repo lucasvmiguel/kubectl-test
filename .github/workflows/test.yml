@@ -1,23 +1,17 @@
-name: "Test"
 on: [pull_request, push]
 
 jobs:
-  minikube-test:
+  example:
+    name: Example Minikube-Kubernetes Cluster interaction
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: opsgang/ga-setup-minikube@v0.1.1
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v1.0.1
         with:
-          minikube-version: 1.4.0
-          k8s-version: 1.16.2
-      - name: Testing
-        run: |
-          minikube config set vm-driver kvm2
-          minikube config set kubernetes-version 1.16.2
-          minikube start
-          minikube update-context
-          kubectl cluster-info
-          kubectl get pods -n kube-system
-          pwd
-          ls
-          echo $PATH
+          minikube version: "v1.5.2"
+          kubernetes version: "v1.16.2"
+          github token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Interact with the cluster
+        run: kubectl get nodes
