@@ -13,7 +13,7 @@ jobs:
       - name: Testing
         run: |
           minikube config set vm-driver kvm2
-          minikube config set kubernetes-version=1.16.2
+          minikube config set kubernetes-version 1.16.2
           minikube start
           minikube update-context
           kubectl cluster-info
