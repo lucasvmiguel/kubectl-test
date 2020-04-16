@@ -11,9 +11,5 @@ spec:
         - name: main
           image: bash
           command:
-            [
-              "bash",
-              "-c",
-              "sleep 10 && echo 'Job Ended Successfully' && exit 0",
-            ]
+            ["bash", "-c", "sleep 5 && echo 'Job Ended Successfully' && exit 0"]
       restartPolicy: Never
