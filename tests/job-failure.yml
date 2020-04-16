@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-failure
+  labels:
+    type: test
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          image: bash
+          command:
+            [
+              "bash",
+              "-c",
+              "sleep 10 && echo 'Job ended with a failure' && exit 1",
+            ]
+      restartPolicy: Never

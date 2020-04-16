@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-success
+  labels:
+    type: test
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          image: bash
+          command:
+            [
+              "bash",
+              "-c",
+              "sleep 10 && echo 'Job Ended Successfully' && exit 0",
+            ]
+      restartPolicy: Never

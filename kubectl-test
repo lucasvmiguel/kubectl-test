@@ -1,0 +1,118 @@
+#!/bin/bash
+
+LABEL='type=test'
+NAMESPACE='-n default'
+
+help_cmd () {
+    echo
+    echo "A kubectl plugin to run integration tests in a kubernetes cluster,"
+    echo "the job status is going to be used to define if a test has passed or not."
+    echo "To create a new test it is required to create at least one job with a label: $LABEL"
+    echo
+    echo
+    echo "  Usage:"
+    echo "    kubectl test <action>"
+    echo
+    echo "  Targets:"
+    echo "    kubectl test --help             Show help command"
+    echo "    kubectl test check              Check if the tests were successfull"
+    echo "    kubectl test cleanup            Remove all test resources from the cluster"
+    echo
+
+    exit 0
+}
+
+if [[ "$1" == "--help" ]]
+then
+    help_cmd
+fi
+
+if [[ "$1" == "check" ]]
+then
+    echo
+    echo '#################################################'
+    echo '#################################################'
+    echo '############# K8S INTEGRATION TESTS #############'
+    echo '#################################################'
+    echo '#################################################'
+    echo
+
+    if [[ -z "$2" ]]
+    then
+        echo 'Testing default namespace...'
+    else
+        NAMESPACE="-n $2"
+        echo 'Testing $2 namespace...'
+    fi
+
+    length_all_jobs=$(kubectl get jobs $NAMESPACE -l $LABEL -o json  | jq '.items | map(.metadata.name) | length')
+    if [[ "$length_all_jobs" -eq 0 ]]
+    then
+        exit 0
+    fi
+
+    {
+    jobs_running=$(kubectl get jobs $NAMESPACE $(kubectl get jobs $NAMESPACE -l $LABEL -o=jsonpath='{.items[?(@.status.active==1)].metadata.name}') do-not-worry-about-this-error -o json | jq '.items | map(.metadata.name)')
+    jobs_successed=$(kubectl get jobs $NAMESPACE $(kubectl get jobs $NAMESPACE -l $LABEL -o=jsonpath='{.items[?(@.status.succeeded==1)].metadata.name}') do-not-worry-about-this-error -o json | jq '.items | map(.metadata.name)')
+    jobs_failed=$(kubectl get jobs $NAMESPACE $(kubectl get jobs $NAMESPACE -l $LABEL -o=jsonpath='{.items[?(@.status.failed>0)].metadata.name}') do-not-worry-about-this-error -o json | jq '.items | map(.metadata.name)')
+    length_jobs_running=$(echo $jobs_running | jq 'length')
+    length_jobs_successed=$(echo $jobs_successed | jq 'length')
+    length_jobs_failed=$(echo $jobs_failed | jq 'length')
+    } &> /dev/null
+
+    if [[ "$length_jobs_running" -gt 0 ]]
+    then
+        echo
+        echo '#################################################'
+        echo '############### TESTS RUNNING YET ###############'
+        echo '#################################################'
+        echo
+        echo $jobs_running | jq .[]
+        echo
+    fi
+    
+    if [[ "$length_jobs_successed" -gt 0 ]]
+    then
+        echo
+        echo '#################################################'
+        echo '################# TESTS PASSED ##################'
+        echo '#################################################'
+        echo
+        echo $jobs_successed | jq .[]
+        echo 
+    fi
+
+    if [[ "$length_jobs_failed" -gt 0 ]]
+    then
+        echo
+        echo '#################################################'
+        echo '################# TESTS FAILED ##################'
+        echo '#################################################'
+        echo 
+        echo $jobs_failed | jq .[]
+        echo
+        echo
+        echo
+        echo 'Debug the failed jobs using the following commands:'
+        echo
+        echo $jobs_failed | jq "map(\"kubectl describe jobs $NAMESPACE \" + .)" | jq '.[]'
+        echo
+        exit 1
+    fi
+    exit 0
+fi
+
+if [[ "$1" == "cleanup" ]]
+then
+    echo
+    echo '#################################################'
+    echo '################ DELETING TESTS #################'
+    echo '#################################################'
+    echo
+    kubectl delete jobs $NAMESPACE -l $LABEL
+    echo
+    exit 0
+fi
+
+
+help_cmd
