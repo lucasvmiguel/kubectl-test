@@ -1,5 +1,7 @@
 # kubectl-test
 
+![.github/workflows/test.yml](https://github.com/lucasvmiguel/kubectl-test/workflows/.github/workflows/test.yml/badge.svg)
+
 A kubectl plugin to run integration tests in a kubernetes cluster, the job status is going to be used to define if a test has passed or not. To create a new test it is required to create at least one job with a label: type=test (label can be modified)
 
 Reference: https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/
