@@ -10,7 +10,7 @@ jobs:
       - name: Install JQ
         run: sudo apt-get install jq
       - name: Install Kubectl Test
-        run: chmod +x ./kubectl-test && cp ./kubectl-test /usr/local/bin
+        run: chmod +x ./kubectl-test && sudo cp ./kubectl-test /usr/local/bin
       - name: Setup Minikube
         uses: manusa/actions-setup-minikube@v1.0.1
         with:
