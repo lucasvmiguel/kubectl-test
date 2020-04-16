@@ -8,7 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install JQ
-        run: apt-get install jq
+        run: sudo apt-get install jq
       - name: Install Kubectl Test
         run: chmod +x ./kubectl-test && cp ./kubectl-test /usr/local/bin
       - name: Setup Minikube
