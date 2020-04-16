@@ -24,6 +24,8 @@ cp kubectl-test /usr/local/bin
 
 ## Usage
 
+You can also see the usage if you run `kubectl test --help`
+
 ```bash
 A kubectl plugin to run integration tests in a kubernetes cluster,
 the job status is going to be used to define if a test has passed or not.
@@ -41,6 +43,8 @@ To create a new test it is required to create at least one job with a label:
 
 ## Test case
 
+Any job with the label `type=test` should work as a test case. (this label can be modified)
+
 ```yml
 apiVersion: batch/v1
 kind: Job
@@ -54,6 +58,6 @@ spec:
       containers:
         - name: main
           image: bash
-          command: ["/bin/bash", "-c", "sleep 10 && exit 0"]
+          command: ["bash", "-c", "sleep 10 && exit 0"]
       restartPolicy: Never
 ```
